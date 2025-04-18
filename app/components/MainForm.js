@@ -3,14 +3,13 @@ import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/cjs/Button";
 import Alert from "react-bootstrap/Alert";
-import List from "./List";
-import ListSelect from "./ListSelect";
-import ManualEmailForm from "./ManualEmailForm";
 import ThankYou from "./ThankYou";
 import { animateScroll as scroll } from "react-scroll";
 import { fetchRepresentatives } from "../assets/petitions/fetchRepresentatives";
 import { fetchLeads } from "../assets/petitions/fetchLeads";
 import LoadingMainForm from "./LoadingMainForm";
+import { sendEmail } from "../assets/petitions/sendEmail";
+import { useEffect } from "react";
 const MainForm = ({
   dataUser,
   setDataUser,
@@ -20,7 +19,6 @@ const MainForm = ({
   emailData,
   clientId,
   states,
-  tweet,
   typData,
   mainData,
   backendURLBase,
@@ -33,7 +31,7 @@ const MainForm = ({
   colors,
   formFields,
 }) => {
-  const [showManualEmailForm, setShowManualEmailForm] = useState(true);
+  
   const [showLoadSpin, setShowLoadSpin] = useState(false);
   const [showList, setShowList] = useState(true);
   const [showFindForm, setShowFindForm] = useState(false);
@@ -56,23 +54,6 @@ const MainForm = ({
       setTac(false);
     }
   };
-  const selectAll = (e) => {
-    fetchLeads(
-      true,
-      backendURLBase,
-      endpoints,
-      clientId,
-      dataUser,
-      emailData,
-      "NA",
-      "checkbox-list-email-preference-lead"
-    );
-    setMany(true);
-    setEmails([...mp, ...senator]);
-    e.preventDefault();
-    setShowListSelect(false);
-    setShowList(true);
-  };
   const handleChange = (e) => {
     e.preventDefault();
     setDataUser({
@@ -87,11 +68,7 @@ const MainForm = ({
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     return emailRegex.test(email.trim());
   };
-  const back = (e) => {
-    e.preventDefault;
-    setShowFindForm(false);
-    setShowList(true);
-  };
+
   const click = async (e) => {
     e.preventDefault();
     console.log(dataUser, "dataUser");
@@ -108,7 +85,7 @@ const MainForm = ({
     setValidated(true);
     setShowLoadSpin(true);
     setError(false);
-    fetchRepresentatives(
+    const representatives = await fetchRepresentatives(
       "GET",
       backendURLBase,
       endpoints.toGetRepresentativesByCp,
@@ -117,11 +94,9 @@ const MainForm = ({
       setMp,
       setSenator,
       setShowLoadSpin,
-      setShowManualEmailForm,
-      setShowListSelect,
-      setShowFindForm,
       setAllDataIn
     ).catch((error) => console.log("error", error));
+    
     scroll.scrollToBottom();
     if (!mainData) return "loading datos";
     if (!mp) return "loading datos";
@@ -135,7 +110,13 @@ const MainForm = ({
       "NA",
       "basic-data-user"
     );
+    setShowFindForm(true)
+    setShowThankYou(false)
   };
+  useEffect(() => {
+  if(allDataIn.length === 0) return 
+  sendEmail("GET", backendURLBaseServices, endpoints, clientId, dataUser,emailData,allDataIn);
+  }, [allDataIn]);
   if (!mainData) return "loading datos";
   if (!mp) return "loading datos";
   return (
@@ -261,142 +242,8 @@ const MainForm = ({
             </Form.Group>
             {showLoadSpin ? loading("spinner-containerB") : null}
           </Form>
-       { /*<div className={"container senators-container"} hidden={showList}>
-            <h3 className="main-texts-color instruction-text">
-              Select your representatives
-            </h3>
-            <div className="note-container">
-              <span
-                className="link-simulation links-checkboxes-color change-mode-list-btn"
-                onClick={selectAll}
-              >
-                Email / all several representatives
-              </span>
-              <p>{mainData.note}</p>
-            </div>
-            <div className="list-container">
-              <h5 className="representative-position">Senators</h5>
-              <div className="representatives-container">
-                {senator && senator.length > 0 ? (
-                  senator.map((mps, index) => (
-                    <List
-                      setMany={setMany}
-                      setShowFindForm={setShowFindForm}
-                      emailData={emailData}
-                      setEmailData={setEmailData}
-                      dataUser={dataUser}
-                      mps={mps}
-                      clientId={clientId}
-                      key={index}
-                      tweet={tweet}
-                      setShowList={setShowList}
-                      setShowMainContainer={setShowMainContainer}
-                      colors={colors}
-                      backendURLBase={backendURLBase}
-                      endpoints={endpoints}
-                      setShowManualEmailForm={setShowManualEmailForm}
-                    />
-                  ))
-                ) : (
-                  <Alert variant="danger">
-                    No representatives have been found with the state that has
-                    provided us
-                  </Alert>
-                )}
-              </div>
-            </div>
-            <div className="list-container">
-              <h5 className="representative-position">MP`S</h5>
-              <div className="representatives-container">
-                {mp && mp.length > 0 ? (
-                  mp.map((mps, index) => (
-                    <List
-                      setMany={setMany}
-                      setShowFindForm={setShowFindForm}
-                      emailData={emailData}
-                      setEmailData={setEmailData}
-                      dataUser={dataUser}
-                      mps={mps}
-                      clientId={clientId}
-                      key={index}
-                      tweet={tweet}
-                      setShowList={setShowList}
-                      setShowMainContainer={setShowMainContainer}
-                      colors={colors}
-                      backendURLBase={backendURLBase}
-                      endpoints={endpoints}
-                      setShowManualEmailForm={setShowManualEmailForm}
-                    />
-                  ))
-                ) : (
-                  <Alert variant="danger">
-                    No representatives have been found with the state that has
-                    provided us
-                  </Alert>
-                )}
-              </div>
-            </div>
-            <Button className="back-button" onClick={back}>
-              Back
-            </Button>
-          </div>
-          <div
-            className={"container senators-container"}
-            hidden={showListSelect}
-          >
-            <h2 className="main-texts-color instruction-text">
-              Select all representatives you’d like to email
-            </h2>
-            <div className="representatives-container">
-              {mp.length > 0 ? (
-                <ListSelect
-                  setShowList={setShowList}
-                  setShowManualEmailForm={setShowManualEmailForm}
-                  setError={setError}
-                  setValidated={setValidated}
-                  emails={emails}
-                  tac={tac}
-                  setShowFindForm={setShowFindForm}
-                  emailData={emailData}
-                  setEmailData={setEmailData}
-                  dataUser={dataUser}
-                  clientId={clientId}
-                  setAllDataIn={setAllDataIn}
-                  showMainContainer={showMainContainer}
-                  setShowMainContainer={setShowMainContainer}
-                  backendURLBase={backendURLBase}
-                  endpoints={endpoints}
-                  setShowListSelect={setShowListSelect}
-                />
-              ) : (
-                <Alert variant="danger">
-                  No representatives have been found with the state that has
-                  provided us
-                </Alert>
-              )}
-            </div>
-          </div>*/}
         </div>
       </div>
-      <ManualEmailForm
-        many={many}
-        setShowList={setShowList}
-        setShowThankYou={setShowThankYou}
-        setShowFindForm={setShowFindForm}
-        dataUser={dataUser}
-        emailData={emailData}
-        setEmailData={setEmailData}
-        setDataUser={setDataUser}
-        clientId={clientId}
-        endpoints={endpoints}
-        backendURLBase={backendURLBase}
-        backendURLBaseServices={backendURLBaseServices}
-        mainData={mainData}
-        allDataIn={allDataIn}
-        setShowMainContainer={setShowMainContainer}
-        showManualEmailForm={showManualEmailForm}
-        setShowManualEmailForm={setShowManualEmailForm}
-      />
       <ThankYou
         emailData={emailData}
         setDataUser={setDataUser}

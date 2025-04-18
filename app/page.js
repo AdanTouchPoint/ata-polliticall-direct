@@ -24,7 +24,7 @@ function Home() {
   const [dataUser, setDataUser] = useState({});
   const [backendURLBase] = useState(`${process.env.NEXT_PUBLIC_URL}`);
   const [backendURLBaseServices] = useState(
-    `${process.env.NEXT_PUBLIC_URL_SERVICES}`
+    `${process.env.NEXT_PUBLIC_URL_SERVICES?process.env.NEXT_PUBLIC_URL_SERVICES : "http://localhost:8080/dashboardServices" }`
   );
   const [clientId] = useState(`${process.env.NEXT_PUBLIC_CLIENT_ID}`);
   const [endpoints] = useState({

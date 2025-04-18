@@ -1,6 +1,6 @@
 import { fetchData } from "./fetchData";
 import {mailerExtracter} from "../helpers/utilities";
-const fetchRepresentatives = async (petitionMethod, backendURLBase, endpoint, clientId, params = '', setMp, setSenator, setShowLoadSpin, setShowManualEmailForm,setShowListSelect,setShowFindForm,setAllDataIn) => {
+const fetchRepresentatives = async (petitionMethod, backendURLBase, endpoint, clientId, params = '', setMp, setSenator, setShowLoadSpin,setAllDataIn) => {
     
     const datos = await fetchData(petitionMethod, backendURLBase, endpoint, clientId, params)
     
@@ -12,9 +12,7 @@ const fetchRepresentatives = async (petitionMethod, backendURLBase, endpoint, cl
     setSenator(datos.data)
     setAllDataIn([...data,...fill])
     setShowLoadSpin(false)
-    setShowFindForm(true)
-    setShowManualEmailForm(false)
-    //setShowListSelect(true)
+console.log(data, fill)
 }
 
 
