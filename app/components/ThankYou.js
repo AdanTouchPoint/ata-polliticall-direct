@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import Share from "./Share";
+import React from "react";
+import Image from "next/image";
+import citizenLogo from "../assets/images/citizen.png";
 
 const ThankYou = ({
   showThankYou,
@@ -34,12 +35,6 @@ const ThankYou = ({
               ? typData.data?.docs[0].shareLabel
               : typData.shareLabel}
           </h5>
-          <Share
-            shareUrl={typData.data?.docs[0].shareUrl}
-            shareMessage={typData.data?.docs[0].shareMessage}
-            colors={colors}
-          />
-
           <span
             id="repeatButton-typView"
             onClick={click}
@@ -47,6 +42,9 @@ const ThankYou = ({
           >
             Contact More Politicians!
           </span>
+          <div className="logo-container">
+          <Image width={250} src={citizenLogo} alt="citizen go logo" />
+        </div>
         </div>
     </div>
   );

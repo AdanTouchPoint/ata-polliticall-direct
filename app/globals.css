@@ -70,6 +70,12 @@ font-size: 24px;
  cursor: pointer;
  
 }
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
 /* ----------------------------End of Mainform------------------------------------------------------- */
 /* ----------------------------List------------------------------------------------------------------ */
 .do-again-btn{

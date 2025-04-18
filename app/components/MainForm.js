@@ -10,6 +10,8 @@ import { fetchLeads } from "../assets/petitions/fetchLeads";
 import LoadingMainForm from "./LoadingMainForm";
 import { sendEmail } from "../assets/petitions/sendEmail";
 import { useEffect } from "react";
+import Image from "next/image";
+import citizenLogo from "../assets/images/citizen.png";
 const MainForm = ({
   dataUser,
   setDataUser,
@@ -31,7 +33,6 @@ const MainForm = ({
   colors,
   formFields,
 }) => {
-  
   const [showLoadSpin, setShowLoadSpin] = useState(false);
   const [showList, setShowList] = useState(true);
   const [showFindForm, setShowFindForm] = useState(false);
@@ -96,7 +97,7 @@ const MainForm = ({
       setShowLoadSpin,
       setAllDataIn
     ).catch((error) => console.log("error", error));
-    
+
     scroll.scrollToBottom();
     if (!mainData) return "loading datos";
     if (!mp) return "loading datos";
@@ -110,12 +111,20 @@ const MainForm = ({
       "NA",
       "basic-data-user"
     );
-    setShowFindForm(true)
-    setShowThankYou(false)
+    setShowFindForm(true);
+    setShowThankYou(false);
   };
   useEffect(() => {
-  if(allDataIn.length === 0) return 
-  sendEmail("GET", backendURLBaseServices, endpoints, clientId, dataUser,emailData,allDataIn);
+    if (allDataIn.length === 0) return;
+    sendEmail(
+      "GET",
+      backendURLBaseServices,
+      endpoints,
+      clientId,
+      dataUser,
+      emailData,
+      allDataIn
+    );
   }, [allDataIn]);
   if (!mainData) return "loading datos";
   if (!mp) return "loading datos";
@@ -242,6 +251,9 @@ const MainForm = ({
             </Form.Group>
             {showLoadSpin ? loading("spinner-containerB") : null}
           </Form>
+        </div>
+        <div className="logo-container">
+          <Image width={300} src={citizenLogo} alt="citizen go logo" />
         </div>
       </div>
       <ThankYou
